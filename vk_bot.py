@@ -184,8 +184,9 @@ class VK_client_bot_guest(VK_Client_bot):
                 # def add_connect_to_db(guest_id, vk_user_id)-ключи!
                 add_connect_to_db(pk_bot_guest, pk_vk_user)
             
-            dublies.append(user)
-            print(f'{user['id']=} уже есть в базе ')
+            else:
+                dublies.append(user)
+                print(f'{user['id']=} уже есть в базе ')
             
         for user_dubl in dublies:
             deleted_user = candidats_response.remove(user_dubl)
