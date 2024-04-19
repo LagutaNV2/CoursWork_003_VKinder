@@ -113,6 +113,9 @@ class VK_client_bot_guest(VK_Client_bot):
             print(f'{user['id']=}')
             if 'city' not in list(user):
                 user['city'] = {"id": '', "title": ''}
+                
+            if 'bdate' not in list(user):
+                user['bdate'] = '1.1.2000'
             
             if check_vk_user(user['id']) is None:
                 try:
@@ -121,8 +124,6 @@ class VK_client_bot_guest(VK_Client_bot):
                     
                     pk_bot_guest = get_bot_user(user_id)
                     pk_vk_user = check_vk_user(user['id'])
-                    
-                    # def add_connect_to_db(guest_id, vk_user_id)-ключи!
                     add_connect_to_db(pk_bot_guest, pk_vk_user)
                 except:
                     photo_01, photo_02, photo_03 = None, None, None
@@ -135,8 +136,8 @@ class VK_client_bot_guest(VK_Client_bot):
                 dublies.append(user)
                 print(f'{user['id']=} уже есть в базе ')
         for user_dubl in dublies:
-            deleted_user = candidats_response.remove(user_dubl)
-            print(f'{deleted_user=}')
+            candidats_response.remove(user_dubl)
+            
         pprint(f'after: {len(candidats_response)=}, \n {candidats_response=}')
         return candidats_response
     
@@ -174,13 +175,23 @@ class VK_client_bot_guest(VK_Client_bot):
             if 'city' not in list(user):
                 user['city'] = {"id": '', "title": ''}
             
+            if 'bdate' not in list(user):
+                user['bdate'] = '1.1.2000'
+            
             if check_vk_user(user['id']) is None:
-                photo_01, photo_02, photo_03 = vk_bot._get_candidats_photos(user['id'])
-                add_vk_users(user, photo_01, photo_02, photo_03)
-                
-                pk_bot_guest = get_bot_user(user_id)
-                pk_vk_user = check_vk_user(user['id'])
-                add_connect_to_db(pk_bot_guest, pk_vk_user)
+                try:
+                    photo_01, photo_02, photo_03 = vk_bot._get_candidats_photos(user['id'])
+                    add_vk_users(user, photo_01, photo_02, photo_03)
+                    
+                    pk_bot_guest = get_bot_user(user_id)
+                    pk_vk_user = check_vk_user(user['id'])
+                    add_connect_to_db(pk_bot_guest, pk_vk_user)
+                except:
+                    photo_01, photo_02, photo_03 = None, None, None
+                    add_vk_users(user, photo_01, photo_02, photo_03)
+                    pk_bot_guest = get_bot_user(user_id)
+                    pk_vk_user = check_vk_user(user['id'])
+                    add_connect_to_db(pk_bot_guest, pk_vk_user)
             
             else:
                 dublies.append(user)
