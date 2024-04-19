@@ -167,10 +167,10 @@ class VK_client_bot_guest(VK_Client_bot):
         
         candidats_response = response.json()['response']['items']
         dublies = []
-        
+        pprint(f'befor ext_serch: {len(candidats_response)=}, \n {candidats_response=}')
         for user in candidats_response:
-            print(f'{user['id']=}')
-            pprint(f'{user=}')
+            # print(f'{user['id']=}')
+            # pprint(f'{user=}')
             if 'city' not in list(user):
                 user['city'] = {"id": '', "title": ''}
             
@@ -180,8 +180,6 @@ class VK_client_bot_guest(VK_Client_bot):
                 
                 pk_bot_guest = get_bot_user(user_id)
                 pk_vk_user = check_vk_user(user['id'])
-                
-                # def add_connect_to_db(guest_id, vk_user_id)-ключи!
                 add_connect_to_db(pk_bot_guest, pk_vk_user)
             
             else:
@@ -189,9 +187,9 @@ class VK_client_bot_guest(VK_Client_bot):
                 print(f'{user['id']=} уже есть в базе ')
             
         for user_dubl in dublies:
-            deleted_user = candidats_response.remove(user_dubl)
-            print(f'{deleted_user=}')
-        pprint(f'after: {len(candidats_response)=}, \n {candidats_response=}')
+            candidats_response.remove(user_dubl)
+            
+        pprint(f'after extended search: {len(candidats_response)=}, \n {candidats_response=}')
         return candidats_response
     
     def _get_candidats_photos(self, candidat_id):
@@ -400,14 +398,16 @@ class VK_client_bot_guest(VK_Client_bot):
                                              user_descript['bdate'][-4:],
                                              self._user_id,
                                              count_for_search)
-            if candidads == []:
-                # поиск по городу не дал результатов, запускаем расширенный поиск
+            # if candidads == []:
+            if len(candidads) < count_for_search:
+                # поиск по городу не дал результатов или дал меньше кандидатов,
+                # запускаем расширенный поиск
                 self._users_search_extend = True
                 candidads = vk_bot.get_candidats_extend(user_descript['candidate_sex'],
                                                         user_descript['country']['id'],
                                                         user_descript['bdate'][-4:],
                                                         self._user_id,
-                                                        count_for_search)
+                                                        count_for_search-len(candidads))
             print(f'{candidads=}')
             if candidads == []:
                 message_for_user = (f"Поиск не дает новых кандидатов. "
